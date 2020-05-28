@@ -26,15 +26,8 @@ login_manager.init_app(app)
 @admin.route('/admin', methods=('GET', 'POST'))
 def admin_main():
     if request.method == 'POST':
-        if request.form['username'] is None:
-            if request.form['ticket_number'] is not None and request.form['ticket_owner2'] is not None:
-                #print("ticket_number is set!")
-                if request.form['ticket_number'].isdigit():
-                    #print("ticket_number is digit!")
-                else:
-                    context = {
-                        "error": "Количество купонов должно быть числом!"
-                    }
+        if request.form['username'] is None or request.form['password'] is None:
+            return redirect(url_for('admin.add_tickets'))
         else:
             username = request.form['username']
             password = request.form['password']
