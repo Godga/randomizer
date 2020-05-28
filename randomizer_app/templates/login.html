@@ -1,0 +1,31 @@
+<html>
+    <head>
+        <title>Login</title>
+        <meta charset="utf-8">
+        <link href="{{ url_for('static', filename='css/login.css') }}" rel="stylesheet">
+        <link href="{{ url_for('static', filename='css/libraries/bootstrap.min.css') }}" rel="stylesheet" media="screen">
+    </head>
+    <body>
+        <script src="{{ url_for('static', filename='js/jquery-3.5.0.min.js') }}"></script>
+        <script src="{{ url_for('static', filename='js/login.js') }}"></script>
+        <div class="login-container">
+            <form class="form-container" method="post" action="/admin">
+            	<table align="center">
+             	    <tr>
+              	        <td><input placeholder="Введите имя пользователя" type="text" name="username" required></td>
+                    </tr>
+                    <tr>
+                        <td><input placeholder="Введите пароль учетной записи" type="password" name="password" required></td>
+                   </tr>
+	                <tr>
+                        <td><button class="btn btn-primary ml-auto" type="submit">Войти</button></td>
+                    </tr>
+                    <tr>
+                        <td><div class="error">{{ error }}</div></td>
+                   </tr>
+   	            </table>
+            </form>
+        </div>
+        <div class="loader"><div class="lds-default"><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div></div></div>
+    </body>
+</html>
