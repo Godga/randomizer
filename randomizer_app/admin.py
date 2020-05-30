@@ -117,8 +117,8 @@ def add_tickets():  # Добавление купонов
                     avatar_dir = os.path.join(avatar_dir, 'images', member_link+'.png')
                     if os.path.exists(avatar_dir) != True:
                         generate_avatar(420, 12, avatar_dir)
-                    cookie['raffle_link'] = raffle_link
-                    cookie['ticket_link'] = ticket_link
+                    cookie['raffle_link'] = "%sraffle/%s" % (request.host_url, raffle_link)
+                    cookie['ticket_link'] = "%sactivate/%s" % (request.host_url, ticket_link)
                     cookie['filename'] = filename
                     cookie['result'] = "Купоны добавлены успешно!"
                     cookie['avatar'] = url_for('static', filename='images/'+member_link+'.png')
@@ -133,7 +133,7 @@ def add_tickets():  # Добавление купонов
             cookie['active_1'] = 'active'
             if request.form['raffle_id1'].isdigit():
                 if Raffles.query.filter_by(ended=False).filter_by(id=int(request.form['raffle_id1'])).first() is not None:
-                    raffle_id = int(request.form['raffle_id2'])
+                    raffle_id = int(request.form['raffle_id1'])
                     raffle = Raffles.query.filter_by(id=raffle_id).first()
                     raffle_link = raffle.link
                     ticket_owner = request.form['ticket_owner1']
@@ -167,7 +167,7 @@ def add_tickets():  # Добавление купонов
                     avatar_dir = os.path.join(avatar_dir, 'images', member_link+'.png')
                     if os.path.exists(avatar_dir) != True:
                         generate_avatar(420, 12, avatar_dir)
-                    cookie['raffle_link'] = "/raffle/%s" % (raffle.link)
+                    cookie['raffle_link'] = raffle.link
                     cookie['ticket_link'] = ticket_link
                     cookie['ticket_hash'] = ticket_hash
                     cookie['result'] = "Купон добавлен успешно!"

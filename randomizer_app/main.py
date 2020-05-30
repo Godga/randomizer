@@ -45,7 +45,7 @@ def activate(raffle_link):
             if request.form['ticket'] is not None and request.form['ticket'] != "":
                 ticket_hash = request.form['ticket']
                 for ticket in raffle.tickets:
-                    print(ticket.ticket_hash)
+                    #print(ticket.ticket_hash)
                     if ticket.ticket_hash == ticket_hash:
                         member = Members.query.filter(Members.id == ticket.owner_id).first()
                         member_link = member.member_link
@@ -81,6 +81,7 @@ def activate(raffle_link):
             tickets = []
             value = {}
             for ticket in raffle.tickets:
+                print(ticket.ticket_hash)
                 if ticket.activated:
                     member = Members.query.filter_by(id=ticket.owner_id).first()
                     value['owner_name'] = member.member_name
