@@ -38,73 +38,79 @@ def index():
 def activate(raffle_link):
     if Raffles.query.filter_by(link=raffle_link).first() is not None:
         raffle = Raffles.query.filter_by(link=raffle_link).first()
-        context = {
-            "raffle_desc": raffle.description
-        }
-        if request.method == 'POST':
-            if request.form['ticket'] is not None and request.form['ticket'] != "":
-                ticket_hash = request.form['ticket']
-                for ticket in raffle.tickets:
-                    #print(ticket.ticket_hash)
-                    if ticket.ticket_hash == ticket_hash:
-                        member = Members.query.filter(Members.id == ticket.owner_id).first()
-                        member_link = member.member_link
-                        if ticket.activated != True:
-                            ticket.activated = True
-                            try:
-                                db.session.commit()
-                            except Exception as e:
-                                print("Exception occured: "+str(e))
-                                cookie['error'] = "Ошибка базы данных"
+        if datetime.datetime.now()>raffle.date-datetime.timedelta(seconds=raffle_delay):
+            context = {
+                "raffle_desc": raffle.description
+            }
+            if request.method == 'POST':
+                if request.form['ticket'] is not None and request.form['ticket'] != "":
+                    ticket_hash = request.form['ticket']
+                    for ticket in raffle.tickets:
+                        #print(ticket.ticket_hash)
+                        if ticket.ticket_hash == ticket_hash:
+                            member = Members.query.filter(Members.id == ticket.owner_id).first()
+                            member_link = member.member_link
+                            if ticket.activated != True:
+                                ticket.activated = True
+                                try:
+                                    db.session.commit()
+                                except Exception as e:
+                                    print("Exception occured: "+str(e))
+                                    cookie['error'] = "Ошибка базы данных"
+                                    return redirect(url_for('main.activate', raffle_link=raffle_link))
+                                avatar_dir = os.path.join(app.root_path, "static")
+                                avatar_dir = os.path.join(avatar_dir, 'images', member_link+'.png')
+                                if os.path.exists(avatar_dir) != True:
+                                    generate_avatar(420, 12, avatar_dir)
+                                cookie['avatar'] = url_for('static', filename='images/'+member_link+'.png')
+                                cookie['result'] = "Купон успешно активирован!"
                                 return redirect(url_for('main.activate', raffle_link=raffle_link))
-                            avatar_dir = os.path.join(app.root_path, "static")
-                            avatar_dir = os.path.join(avatar_dir, 'images', member_link+'.png')
-                            if os.path.exists(avatar_dir) != True:
-                                generate_avatar(420, 12, avatar_dir)
-                            cookie['avatar'] = url_for('static', filename='images/'+member_link+'.png')
-                            cookie['result'] = "Купон успешно активирован!"
-                            return redirect(url_for('main.activate', raffle_link=raffle_link))
-                        else:
-                            avatar_dir = os.path.join(app.root_path, "static")
-                            avatar_dir = os.path.join(avatar_dir, 'images', member_link+'.png')
-                            if os.path.exists(avatar_dir) != True:
-                                generate_avatar(420, 12, avatar_dir)
-                            cookie['avatar'] = url_for('static', filename='images/'+member_link+'.png')
-                            cookie['error'] = "Купон уже активирован"
-                            return redirect(url_for('main.activate', raffle_link=raffle_link))
-                cookie['error'] = "Купон не найден"
-                return redirect(url_for('main.activate', raffle_link=raffle_link))
+                            else:
+                                avatar_dir = os.path.join(app.root_path, "static")
+                                avatar_dir = os.path.join(avatar_dir, 'images', member_link+'.png')
+                                if os.path.exists(avatar_dir) != True:
+                                    generate_avatar(420, 12, avatar_dir)
+                                cookie['avatar'] = url_for('static', filename='images/'+member_link+'.png')
+                                cookie['error'] = "Купон уже активирован"
+                                return redirect(url_for('main.activate', raffle_link=raffle_link))
+                    cookie['error'] = "Купон не найден"
+                    return redirect(url_for('main.activate', raffle_link=raffle_link))
+                else:
+                    cookie['error'] = "Введите купон!"
+                    return redirect(url_for('main.activate', raffle_link=raffle_link))
             else:
-                cookie['error'] = "Введите купон!"
-                return redirect(url_for('main.activate', raffle_link=raffle_link))
+                tickets = []
+                for ticket in raffle.tickets:
+                    if ticket.activated:
+                        print("Тикет - "+ticket.ticket_hash)
+                        member = Members.query.filter_by(id=ticket.owner_id).first()
+                        print("Хозяин - "+member.member_name)
+                        value = {}
+                        value['owner_name'] = member.member_name
+                        value['ticket_hash'] = ticket.ticket_hash
+                        tickets.append(value)
+                if 'error' in cookie and cookie['error'] != "":
+                    context['error'] = cookie['error']
+                    cookie['error'] = ""
+                if 'result' in cookie and cookie['result'] != "":
+                    context['result'] = cookie['result']
+                    cookie['result'] = ""
+                if 'avatar' in cookie and cookie['avatar'] != "":
+                    context['avatar'] = cookie['avatar']
+                    cookie['avatar'] = ""
+                #for ticket in member.member_tickets:
+                #    print(ticket.ticket_hash)
+                context['raffle_link'] = raffle_link
+                print(tickets)
+                if len(tickets):
+                    context['tickets'] = tickets
+                context['raffle_id'] = raffle.id
+                context['raffle_desc'] = raffle.description
+                return render_template('activate.html', **context)
         else:
-            tickets = []
-            for ticket in raffle.tickets:
-                if ticket.activated:
-                    print("Тикет - "+ticket.ticket_hash)
-                    member = Members.query.filter_by(id=ticket.owner_id).first()
-                    print("Хозяин - "+member.member_name)
-                    value = {}
-                    value['owner_name'] = member.member_name
-                    value['ticket_hash'] = ticket.ticket_hash
-                    tickets.append(value)
-            if 'error' in cookie and cookie['error'] != "":
-                context['error'] = cookie['error']
-                cookie['error'] = ""
-            if 'result' in cookie and cookie['result'] != "":
-                context['result'] = cookie['result']
-                cookie['result'] = ""
-            if 'avatar' in cookie and cookie['avatar'] != "":
-                context['avatar'] = cookie['avatar']
-                cookie['avatar'] = ""
-            #for ticket in member.member_tickets:
-            #    print(ticket.ticket_hash)
-            context['raffle_link'] = raffle_link
-            print(tickets)
-            if len(tickets):
-                context['tickets'] = tickets
-            context['raffle_id'] = raffle.id
-            context['raffle_desc'] = raffle.description
+            context = {
+                "big_error": "Розыгрыш начался, активация купонов завершена"
+            }
             return render_template('activate.html', **context)
     else:
         context = {
