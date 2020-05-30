@@ -260,6 +260,7 @@ span:hover {
 	border-radius:30px;
 	margin:0 auto;
 	outline:none;
+	text-decoration: none !important;
 }
 
 .result {

@@ -36,6 +36,8 @@
 	<input id="winner_id" type="hidden" value="{{ winner_id }}">
 	{% else %}
 	<button id="timer" class="btn btn-primary mainbutt"></button>
+	<a href="/activate/{{ raffle_link }}" class="btn btn-primary mainbutt">Активация купонов</a>
+	
 	{% if winners is defined %}
 	<div class="result" >
 		Все победители текущего розыгрыша:<br/>

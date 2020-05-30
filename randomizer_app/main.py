@@ -215,7 +215,8 @@ def activate(raffle_link):
 @main.route('/raffle/<raffle_link>', methods=['POST', 'GET'])
 def roulette(raffle_link):
     context = {
-        "datetime": datetime.datetime.now()
+        "datetime": datetime.datetime.now(),
+        "raffle_link": raffle_link
     }
     members = Members.query.all()
     avatars = []
