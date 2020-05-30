@@ -22,11 +22,21 @@
 							<li class="{{ active_3 }}"><a>Список купонов</a></li>
 						</ul>
 						<div class="tabs_content {{ active_1 }}">
-							<label for="ticket_owner1">Получатель купона:</label>
-							<input type="text" id="ticket_owner1" name="ticket_owner1">
+							<div class="form-inline">
+								<div class="form-group left1">
+									<label for="ticket_owner1">Получатель купона:</label>
+									<input type="text" id="ticket_owner1" name="ticket_owner1">
+								</div>
+								<div class="form-group right1">
+									<label for="raffle_id1">ID розыгрыша:</label>
+									<input type="text" id="raffle_id1" name="raffle_id1">
+								</div>
+							</div>
 							<br style="clear:both;" />
 							<label for="ticket_link">Ссылка для активации:</label>
 							<input type="text" id="ticket_link" name="ticket_link" value="{{ ticket_link }}" disabled>
+							<label for="raffle_link">Ссылка на розыгрыш:</label>
+							<input type="text" id="raffle_link" name="raffle_link" value="{{ raffle_link }}" disabled>
 							<label for="ticket_hash">Купон:</label>
 							<input type="text" id="ticket_hash" name="ticket_hash" value="{{ ticket_hash }}" disabled>
 							<div class="result">{{ result }}{% if avatar is defined %}<br/>Индивидуальный аватар пользователя:<br/><img src="{{ avatar }}" width="150" height="150">{% endif %}</div>
@@ -37,17 +47,23 @@
 						</div>
 						<div class="tabs_content {{ active_2 }}">
 							<div class="form-inline">
-								<div class="form-group left">
-									<label for="ticket_owner">Получатель купона:</label>
+								<div class="form-group left2">
+									<label for="ticket_owner2">Получатель купона:</label>
 									<input type="text" id="ticket_owner2" name="ticket_owner2">
 								</div>
-								<div class="form-group right">
+								<div class="form-group right2">
 									<label for="ticket_number">Количество:</label>
 									<input type="text" id="ticket_number" name="ticket_number">
+								</div>
+								<div class="form-group right2">
+									<label for="raffle_id2">ID розыгрыша:</label>
+									<input type="text" id="raffle_id2" name="raffle_id2">
 								</div>
 								<br style="clear:both;" />
 								<label for="ticket_link">Ссылка для активации:</label>
 								<input type="text" id="ticket_link" name="ticket_link" value="{{ ticket_link }}" disabled>
+								<label for="raffle_link">Ссылка на розыгрыш:</label>
+								<input type="text" id="raffle_link" name="raffle_link" value="{{ raffle_link }}" disabled>
 								{% if filename is defined and filename %}
 								<div class="download_link">
 									<a href="{{ url_for('admin.download_file', filename=filename) }}" target="_blank">Скачать результат</a>
@@ -68,6 +84,7 @@
 									<th>Hash-код купона</th>
 									<th>Обладатель купона</th>
 									<th>Активирован</th>
+									<th>ID розыгрыша</th>
 									<th>Удалить</th>
 								</tr>
 								{% if tickets is defined %}
@@ -78,6 +95,11 @@
 									<td>{{ value.hash }}</td>
 									<td>{{ value.owner }}</td>
 									<td>{{ value.activated }}</td>
+									{% if value.raffle_link != "" %}
+									<td><a href="{{ value.raffle_link }}">{{ value.raffle_id }}</a></td>
+									{% else %}
+									<td>{{ value.raffle_id }}</td>
+									{% endif %}
 									<td>
 										<button type="button" class="delete_ticket">close</button>
 										<input type="hidden" value="{{ value.url }}">

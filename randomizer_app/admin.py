@@ -17,6 +17,8 @@ from time import gmtime, strftime
 from .main import raffle_delay, checkRaffle
 import atexit
 from apscheduler.schedulers.background import BackgroundScheduler
+import string
+
 
 app = Flask(__name__)
 admin = Blueprint('admin', __name__)
@@ -63,97 +65,120 @@ def add_tickets():  # Добавление купонов
         if request.form['ticket_number'] != "" and request.form['ticket_owner2'] != "":
             cookie['active_2'] = 'active'
             #print("ticket_number is set!")
-            if request.form['ticket_number'].isdigit():
+            if request.form['ticket_number'].isdigit() and request.form['raffle_id2'].isdigit():
                 #print("ticket_number is digit!")
-                ticket_owner = request.form['ticket_owner2']
-                if Members.query.filter_by(member_name=ticket_owner).first() is None:
+                
+                if Raffles.query.filter_by(ended=False).filter_by(id=int(request.form['raffle_id2'])).first() is not None:
+                    raffle_id = int(request.form['raffle_id2'])
+                    raffle = Raffles.query.filter_by(id=raffle_id).first()
+                    raffle_link = raffle.link
+                    ticket_owner = request.form['ticket_owner2']
+                    if Members.query.filter_by(member_name=ticket_owner).first() is None:
+                        try:
+                            member_link = shortuuid.uuid()
+                            #print("ticket_link = {}".format(member_link))
+                            member_obj = Members(member_name=ticket_owner, member_link=member_link)
+                            db.session.add(member_obj)
+                            db.session.commit()
+                            #ticket_link = request.host + "/activate/" + member_link
+                        except Exception as e:
+                            print("Exception occured:\n"+str(e))
+                            cookie['error'] = "Ошибка добавления пользователя в базу данных"
+                            return redirect(url_for('admin.add_tickets'))
+                    else:
+                        member_obj = Members.query.filter_by(member_name=ticket_owner).first()
+                        member_link = member_obj.member_link
+                        #ticket_link = request.host + "/activate/" + member_link
+                    ticket_link = "%s/activate/%s" % (request.host, raffle_link)
+                    date = datetime.datetime.now().strftime("%Y-%m-%d")
+                    invalid_chars = string.punctuation
+                    ticket_owner = ''.join(c for c in ticket_owner if c not in invalid_chars)
+                    filename = ticket_owner.replace(" ", "_")+"_"+date+".txt"
+                    files_folder = os.path.join(app.root_path, "tmp")
+                    filedir = os.path.join(files_folder, filename)
+                    f = open(filedir, "w+")
+
+                    for index in range(int(request.form['ticket_number'])):
+                        ticket_hash = uuid.uuid4().hex
+                        #print("ticket_hash = {}".format(str(ticket_hash)))
+                        owner_id = member_obj.id
+                        ticket_obj = Tickets(ticket_hash=ticket_hash, owner_id=owner_id, raffle_id=raffle_id, activated=False)
+                        db.session.add(ticket_obj)
+                        f.write(ticket_hash+"\n")
+
+                    f.close()
                     try:
-                        member_link = shortuuid.uuid()
-                        #print("ticket_link = {}".format(member_link))
-                        member_obj = Members(member_name=ticket_owner, member_link=member_link)
-                        db.session.add(member_obj)
                         db.session.commit()
-                        ticket_link = request.host + "/activate/" + member_link
                     except Exception as e:
                         print("Exception occured:\n"+str(e))
-                        cookie['error'] = "Ошибка добавления пользователя в базу данных"
+                        cookie['error'] = "Ошибка добавления купона в базу данных"
                         return redirect(url_for('admin.add_tickets'))
-                else:
-                    member_obj = Members.query.filter_by(member_name=ticket_owner).first()
-                    member_link = member_obj.member_link
-                    ticket_link = request.host + "/activate/" + member_link
-
-                date = datetime.datetime.now().strftime("%Y-%m-%d")
-                filename = ticket_owner.replace(" ", "_")+"_"+date+".txt"
-                files_folder = os.path.join(app.root_path, "tmp")
-                filedir = os.path.join(files_folder, filename)
-                f = open(filedir, "w+")
-                
-                for index in range(int(request.form['ticket_number'])):
-                    ticket_hash = uuid.uuid4().hex
-                    #print("ticket_hash = {}".format(str(ticket_hash)))
-                    owner_id = member_obj.id
-                    ticket_obj = Tickets(ticket_hash=ticket_hash, owner_id=owner_id, activated=False)
-                    db.session.add(ticket_obj)
-                    f.write(ticket_hash+"\n")
-
-                f.close()
-                try:
-                    db.session.commit()
-                except Exception as e:
-                    print("Exception occured:\n"+str(e))
-                    cookie['error'] = "Ошибка добавления купона в базу данных"
+                    avatar_dir = os.path.join(app.root_path, "static")
+                    avatar_dir = os.path.join(avatar_dir, 'images', member_link+'.png')
+                    if os.path.exists(avatar_dir) != True:
+                        generate_avatar(420, 12, avatar_dir)
+                    cookie['raffle_link'] = raffle_link
+                    cookie['ticket_link'] = ticket_link
+                    cookie['filename'] = filename
+                    cookie['result'] = "Купоны добавлены успешно!"
+                    cookie['avatar'] = url_for('static', filename='images/'+member_link+'.png')
                     return redirect(url_for('admin.add_tickets'))
-                avatar_dir = os.path.join(app.root_path, "static")
-                avatar_dir = os.path.join(avatar_dir, 'images', member_link+'.png')
-                if os.path.exists(avatar_dir) != True:
-                    generate_avatar(420, 12, avatar_dir)
-                cookie['ticket_link'] = ticket_link
-                cookie['filename'] = filename
-                cookie['result'] = "Купоны добавлены успешно!"
-                cookie['avatar'] = url_for('static', filename='images/'+member_link+'.png')
-                return redirect(url_for('admin.add_tickets'))
+                else:
+                    cookie["error"] = "Розыгрыш с таким идентификатором не найден"
+                    return redirect(url_for('admin.add_tickets'))
             else:
-                cookie["error"] = "Количество купонов должно быть числом!"
+                cookie["error"] = "Количество купонов и идентификатор розыгрыша должны быть числом"
                 return redirect(url_for('admin.add_tickets'))
         elif request.form['ticket_owner1'] != "":
             cookie['active_1'] = 'active'
-            ticket_owner = request.form['ticket_owner1']
-            if Members.query.filter_by(member_name=ticket_owner).first() is None:
-                try:
-                    member_link = shortuuid.uuid()
-                    member_obj = Members(member_name=ticket_owner, member_link=member_link)
-                    db.session.add(member_obj)
-                    db.session.commit()
-                    ticket_link = request.host + "/activate/" + member_link
-                except Exception as e:
-                    print("Exception occured:\n"+str(e))
-                    cookie['error'] = "Ошибка добавления пользователя в базу данных"
+            if request.form['raffle_id1'].isdigit():
+                if Raffles.query.filter_by(ended=False).filter_by(id=int(request.form['raffle_id1'])).first() is not None:
+                    raffle_id = int(request.form['raffle_id2'])
+                    raffle = Raffles.query.filter_by(id=raffle_id).first()
+                    raffle_link = raffle.link
+                    ticket_owner = request.form['ticket_owner1']
+                    if Members.query.filter_by(member_name=ticket_owner).first() is None:
+                        try:
+                            member_link = shortuuid.uuid()
+                            member_obj = Members(member_name=ticket_owner, member_link=member_link)
+                            db.session.add(member_obj)
+                            db.session.commit()
+                            #ticket_link = request.host + "/activate/" + member_link
+                        except Exception as e:
+                            print("Exception occured:\n"+str(e))
+                            cookie['error'] = "Ошибка добавления пользователя в базу данных"
+                            return redirect(url_for('admin.add_tickets'))
+                    else:
+                        member_obj = Members.query.filter_by(member_name=ticket_owner).first()
+                        member_link = member_obj.member_link
+                        #ticket_link = request.host + "/activate/" + member_link
+                    ticket_link = "%s/activate/%s" % (request.host, raffle_link)
+                    try:
+                        ticket_hash = uuid.uuid4().hex
+                        owner_id = member_obj.id
+                        ticket_obj = Tickets(ticket_hash=ticket_hash, owner_id=owner_id, raffle_id=raffle_id activated=False)
+                        db.session.add(ticket_obj)
+                        db.session.commit()
+                    except Exception as e:
+                        print("Exception occured:\n"+str(e))
+                        cookie['error'] = "Ошибка добавления в базу данных"
+                        return redirect(url_for('admin.add_tickets'))
+                    avatar_dir = os.path.join(app.root_path, "static")
+                    avatar_dir = os.path.join(avatar_dir, 'images', member_link+'.png')
+                    if os.path.exists(avatar_dir) != True:
+                        generate_avatar(420, 12, avatar_dir)
+                    cookie['raffle_link'] = raffle_link
+                    cookie['ticket_link'] = ticket_link
+                    cookie['ticket_hash'] = ticket_hash
+                    cookie['result'] = "Купон добавлен успешно!"
+                    cookie['avatar'] = url_for('static', filename='images/'+member_link+'.png')
+                    return redirect(url_for('admin.add_tickets'))
+                else:
+                    cookie["error"] = "Розыгрыш с таким идентификатором не найден"
                     return redirect(url_for('admin.add_tickets'))
             else:
-                member_obj = Members.query.filter_by(member_name=ticket_owner).first()
-                member_link = member_obj.member_link
-                ticket_link = request.host + "/activate/" + member_link
-                
-            try:
-                ticket_hash = uuid.uuid4().hex
-                owner_id = member_obj.id
-                ticket_obj = Tickets(ticket_hash=ticket_hash, owner_id=owner_id, activated=False)
-                db.session.add(ticket_obj)
-                db.session.commit()
-            except Exception as e:
-                print("Exception occured:\n"+str(e))
-                cookie['error'] = "Ошибка добавления в базу данных"
+                cookie["error"] = "Идентификатор розыгрыша должен быть числом"
                 return redirect(url_for('admin.add_tickets'))
-            avatar_dir = os.path.join(app.root_path, "static")
-            avatar_dir = os.path.join(avatar_dir, 'images', member_link+'.png')
-            if os.path.exists(avatar_dir) != True:
-                generate_avatar(420, 12, avatar_dir)
-            cookie['ticket_link'] = ticket_link
-            cookie['ticket_hash'] = ticket_hash
-            cookie['result'] = "Купон добавлен успешно!"
-            cookie['avatar'] = url_for('static', filename='images/'+member_link+'.png')
-            return redirect(url_for('admin.add_tickets'))
     else:
         if 'active_3' in cookie and cookie['active_3'] != "":
             context['active_3'] = cookie['active_3']
@@ -187,6 +212,9 @@ def add_tickets():  # Добавление купонов
         if 'filename' in cookie and cookie['filename'] != "":
             context['filename'] = cookie['filename']
             cookie['filename'] = ""
+        if 'raffle_link' in cookie and cookie['raffle_link'] != "":
+            context['raffle_link'] = cookie['raffle_link']
+            cookie['raffle_link'] = ""
         context['tickets'] = getTickets()
         context['nearest_raffle'] = getNearestRaffle()
         resp = make_response(render_template('tickets.html', **context))
@@ -208,7 +236,8 @@ def add_raffle():   # Добавление розыгрышей
             value['id'] = raffle.id
             value['date'] = str(raffle.date)[:-3]
             value['created'] = str(raffle.created_on)[:-3]
-            value['members'] = Tickets.query.filter_by(activated=True).count()
+            value['members'] = Tickets.query.filter(Ticket.raffle_id == raffle.id).filter(Ticket.activated == True).count()
+            value['link'] = "%s/raffle/%s" % (request.host, raffle.link)
             if raffle.winners is not None:
                 value['chance'] = len(json.loads(raffle.winners))
             else:
@@ -249,7 +278,8 @@ def add_raffle():   # Добавление розыгрышей
                         return redirect(url_for('admin.add_raffle'))
 
                 try:
-                    raffle_obj = Raffles(chance=raffle_chance, date=date_out, description=raffle_desc, ended=0)
+                    raffle_link = shortuuid.uuid()
+                    raffle_obj = Raffles(chance=raffle_chance, date=date_out, description=raffle_desc, link=raffle_link, ended=0)
                     db.session.add(raffle_obj)
                     db.session.commit()
                 except Exception as e:
@@ -370,7 +400,7 @@ def raffle_edit(raffle_id):
         context['raffle_chance'] = str(raffle.chance)
         context['raffle_desc'] = raffle.description
         context['raffle_date'] = str(raffle.date).replace(" ", "T")[:-3]
-        context['tickets'] = getTickets()
+        context['tickets'] = getTickets(raffle_id)
         context['nearest_raffle'] = getNearestRaffle()
         return render_template('raffle_edit.html', **context)
 
@@ -434,10 +464,14 @@ def download_file(filename):
 def logout():
     logout_user()
     cookie.clear()
-    return redirect(url_for('admin.admin_main'))
+    return redirect(url_for('admin.admin_main'))    
 
-def getTickets():
-    tickets = Tickets.query.all()
+def getTickets(raffle_id=None):
+    if raffle_id is None:
+        tickets = Tickets.query.all()
+    else:
+        tickets = Tickets.query.filter(Tickets.raffle_id == raffle_id).all()
+        #raffle = Raffles.query.filter_by(raffle_id=raffle_id).first()
     result = []
     for ticket in tickets:
         value = {}
@@ -451,6 +485,14 @@ def getTickets():
         value['owner'] = owner.member_name
         value['created'] = ticket.created_on
         value['url'] = url_for('admin.delete_ticket', ticket_id=ticket.id)
+        #if raffle_id is not None:
+        #    value['raffle_link'] = raffle.link
+        value['raffle_id'] = ticket.raffle_id
+        raffle = Raffles.query.filter(Raffles.id == ticket.raffle_id).first()
+        if raffle is not None:
+            value['raffle_link'] = raffle.link
+        else:
+            value['raffle_link'] = ""
         result.append(value)
     return result
 

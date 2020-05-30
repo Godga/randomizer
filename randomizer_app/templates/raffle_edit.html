@@ -35,6 +35,7 @@
 									<th>Hash-код купона</th>
 									<th>Обладатель купона</th>
 									<th>Активирован</th>
+									<th>ID розыгрыша</th>
 									<th>Удалить</th>
 								</tr>
 								{% if tickets is defined %}
@@ -45,6 +46,7 @@
 									<td>{{ value.hash }}</td>
 									<td>{{ value.owner }}</td>
 									<td>{{ value.activated }}</td>
+									<td>{{ value.raffle_id }}</td>
 									<td>
 										<button type="button" class="delete_ticket">close</button>
 										<input type="hidden" value="{{ value.url }}">
