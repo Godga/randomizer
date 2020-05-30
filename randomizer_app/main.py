@@ -79,11 +79,11 @@ def activate(raffle_link):
                 return redirect(url_for('main.activate', raffle_link=raffle_link))
         else:
             tickets = []
-            value = {}
             for ticket in raffle.tickets:
                 if ticket.activated:
-                    print(ticket.ticket_hash)
+                    print("Тикет - "+ticket.ticket_hash)
                     member = Members.query.filter_by(id=ticket.owner_id).first()
+                    value = {}
                     value['owner_name'] = member.member_name
                     value['ticket_hash'] = ticket.ticket_hash
                     tickets.append(value)
@@ -100,7 +100,8 @@ def activate(raffle_link):
             #    print(ticket.ticket_hash)
             context['raffle_link'] = raffle_link
             print(tickets)
-            context['tickets'] = tickets
+            if len(tickets):
+                context['tickets'] = tickets
             context['raffle_id'] = raffle.id
             context['raffle_desc'] = raffle.description
             return render_template('activate.html', **context)
