@@ -243,7 +243,7 @@ def roulette(raffle_link):
             print("No tickets, abort")
             #raffle = Raffles.query.filter_by(ended=False).order_by(Raffles.date).first()
             raffle.ended == True
-            Tickets.query.filter(Tickets.raffle_id == raffle.id).delete()
+            #Tickets.query.filter(Tickets.raffle_id == raffle.id).delete()
             db.session.commit()
             #context['raffle_date'] = "none"
             return redirect(url_for('main.roulette', raffle_link=raffle_link))
@@ -274,7 +274,7 @@ def roulette(raffle_link):
     elif datetime.datetime.now() > raffle.date and raffle.chance <= 0:
         raffle.ended = True
         #print("ended")
-        Tickets.query.delete()
+        Tickets.query.filter(Tickets.raffle_id == raffle.id).delete()
         raffle = Raffles.query.filter_by(ended=False).order_by(Raffles.date).first()
         db.session.commit()
     #print("Простой")
@@ -320,7 +320,7 @@ def checkRaffle(raffle, participants):
                     winners.append(participants[index])
                     raffle.winners = json.dumps(winners, ensure_ascii=False)
                 else:
-                    Tickets.query.filter(Tickets.raffle_id == raffle.id).filter(Tickets.activated == 0).delete()
+                    #Tickets.query.filter(Tickets.raffle_id == raffle.id).filter(Tickets.activated == 0).delete()
                     raffle.winners = json.dumps([participants[index]], ensure_ascii=False)
                 raffle.chance = int(raffle.chance)-1
                 raffle.date = raffle.date + datetime.timedelta(seconds=raffle_delay)
