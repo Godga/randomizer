@@ -242,8 +242,8 @@ def roulette(raffle_link):
     many_avatars = avatars+avatars
     many_avatars = many_avatars+many_avatars
     many_avatars = many_avatars+avatars
-    #print(raffle.date)
-    #print(datetime.datetime.now())
+    print(raffle.date)
+    print(datetime.datetime.now())
     if datetime.datetime.now() > raffle.date and raffle.chance != 0:
         if len(avatars) == 0:
             print("No tickets, abort")
