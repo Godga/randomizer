@@ -15,11 +15,13 @@
                     <tr>
                         <td><div class="error">{{ big_error }}</div></td>
                     </tr>
+                    {% if raffle_link is defined %}
 	                <tr>
                         <td>
                             <a href="/raffle/{{ raffle_link }}" class="btn btn-primary ml-auto post toraffle">К розыгрышу</a>
                         </td>
                     </tr>
+                    {% endif %}
                     {% else %}
                     <tr>
                         <td><label for="ticket">Активация купонов для розыгрыша №{{ raffle_id }} - {{ raffle_desc }}</br>Введите ваш купон:</label></td>
@@ -32,11 +34,13 @@
                             <button class="btn btn-primary ml-auto post" type="submit">Активировать</button>
                         </td>
                     </tr>
+                    {% if raffle_link is defined %}
 	                <tr>
                         <td>
                             <a href="/raffle/{{ raffle_link }}" class="btn btn-primary ml-auto post toraffle">К розыгрышу</a>
                         </td>
                     </tr>
+                    {% endif %}
                     <tr>
                         <td><div class="error">{{ error }}</div></td>
                     </tr>
