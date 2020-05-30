@@ -47,6 +47,9 @@
 	{% endif %}
 	<input id="raffle_date" type="hidden" value="{{ raffle_date }}">
 	<script src="{{ url_for('static', filename='js/jquery-3.5.0.min.js') }}"></script>
+	<script>
+		var st = "{{ datetime }}"
+	</script>
 	<script src="{{ url_for('static', filename='js/index.js') }}"></script>
 	</body>
 </html>

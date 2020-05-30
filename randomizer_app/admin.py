@@ -231,7 +231,8 @@ def add_tickets():  # Добавление купонов
 @login_required
 def add_raffle():   # Добавление розыгрышей
     context = {
-    "page": "Настройки - добавление розыгрышей"
+    "page": "Настройки - добавление розыгрышей",
+    "datetime": str(datetime.datetime.now())
     }
 
     def getRaffles():
@@ -328,7 +329,8 @@ def add_raffle():   # Добавление розыгрышей
 @login_required
 def change_password():
     context = {
-        "page": "Настройки - смена пароля"
+        "page": "Настройки - смена пароля",
+        "datetime": str(datetime.datetime.now())
     }
     if request.method == 'POST':
         if request.form['old_password'] != "" and request.form['new_password'] != "":
@@ -366,7 +368,8 @@ def change_password():
 @login_required
 def raffle_edit(raffle_id):
     context = {
-        "page": "Настройки - настройка розыгрышей"
+        "page": "Настройки - настройка розыгрышей",
+        "datetime": str(datetime.datetime.now())
     }
     cookie['active_2'] = 'active'
     if Raffles.query.filter_by(id=raffle_id).first() is None:
@@ -414,7 +417,8 @@ def raffle_edit(raffle_id):
 @login_required
 def raffle_results(raffle_id):
     context = {
-        "page": "Настройки - просмотр результатов"
+        "page": "Настройки - просмотр результатов",
+        "datetime": str(datetime.datetime.now())
     }
     cookie['active_3'] = 'active'
     if Raffles.query.filter_by(id=raffle_id).first() is None:

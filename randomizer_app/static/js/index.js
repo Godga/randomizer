@@ -1,34 +1,34 @@
 //Время сервера
-var xmlHttp;
-function srvTime(){
-    try {
-        xmlHttp = new XMLHttpRequest();
-    }
-    catch (err1) {
-        try {
-            xmlHttp = new ActiveXObject('Msxml2.XMLHTTP');
-        }
-        catch (err2) {
-            try {
-                xmlHttp = new ActiveXObject('Microsoft.XMLHTTP');
-            }
-            catch (eerr3) {
-                alert("Устаревший браузер");
-            }
-        }
-    }
-    xmlHttp.open('HEAD',window.location.href.toString(),false);
-    xmlHttp.setRequestHeader("Content-Type", "text/html");
-    xmlHttp.send('');
-    return xmlHttp.getResponseHeader("Date");
-}
+//var xmlHttp;
+//function srvTime(){
+//    try {
+//        xmlHttp = new XMLHttpRequest();
+//    }
+//    catch (err1) {
+//        try {
+//            xmlHttp = new ActiveXObject('Msxml2.XMLHTTP');
+//        }
+//        catch (err2) {
+//            try {
+//                xmlHttp = new ActiveXObject('Microsoft.XMLHTTP');
+//            }
+//            catch (eerr3) {
+//                alert("Устаревший браузер");
+//            }
+//        }
+//    }
+//    xmlHttp.open('HEAD',window.location.href.toString(),false);
+//    xmlHttp.setRequestHeader("Content-Type", "text/html");
+//    xmlHttp.send('');
+//    return xmlHttp.getResponseHeader("Date");
+//}
 
 // Таймер
 $( document ).ready(function() {
     if ($("#raffle_date").val() != "none") {
         var countDownDate = new Date($("#raffle_date").val()).getTime();
         console.log($("#raffle_date").val())
-        var st = srvTime();
+        //var st = srvTime();
         var date = new Date(st);
         console.log(date)
         var x = setInterval(function() {
