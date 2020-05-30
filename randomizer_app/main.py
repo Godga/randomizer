@@ -38,11 +38,11 @@ def index():
 def activate(raffle_link):
     if Raffles.query.filter_by(link=raffle_link).first() is not None:
         raffle = Raffles.query.filter_by(link=raffle_link).first()
+        context = {
+            "raffle_link": raffle.link,
+        }
         if datetime.datetime.now()<raffle.date-datetime.timedelta(seconds=raffle_delay):
             if raffle.ended != True:
-                context = {
-                    "raffle_desc": raffle.description
-                }
                 if request.method == 'POST':
                     if request.form['ticket'] is not None and request.form['ticket'] != "":
                         ticket_hash = request.form['ticket']
@@ -107,6 +107,7 @@ def activate(raffle_link):
                         context['tickets'] = tickets
                     context['raffle_id'] = raffle.id
                     context['raffle_desc'] = raffle.description
+
                     return render_template('activate.html', **context)
             else:
                 context = {
