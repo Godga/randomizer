@@ -26,8 +26,8 @@ login_manager.init_app(app)
 @admin.route('/admin', methods=('GET', 'POST'))
 def admin_main():
     if request.method == 'POST':
-        if request.form['username'] is None:
-            return render_template('login.html')
+        if request.form['username'] is None or request.form['password'] is None:
+            return redirect(url_for('admin.add_tickets'))
         else:
             username = request.form['username']
             password = request.form['password']
@@ -258,7 +258,7 @@ def add_raffle():   # Добавление розыгрышей
                     return redirect(url_for('admin.add_raffle')) 
                 sched = BackgroundScheduler()
                 sched.add_job(checkRafflesPast, 'date', run_date=date_out+datetime.timedelta(seconds=raffle_chance*raffle_delay+raffle_delay+1))  
-                sched.start()    
+                #sched.start()    
                 cookie['result'] = "Розыгрыш добавлен успешно!"       
                 return redirect(url_for('admin.add_raffle'))
             else:
