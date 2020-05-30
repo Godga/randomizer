@@ -122,7 +122,7 @@ def roulette():
 
         #print(raffle.date)
         #print(datetime.datetime.now())
-        if datetime.datetime.now()>raffle.date and raffle.chance != 0:
+        if raffle is not None and datetime.datetime.now()>raffle.date and raffle.chance != 0:
             if len(avatars) == 0:
                 print("No tickets, abort")
                 raffle = Raffles.query.filter_by(ended=False).order_by(Raffles.date).first()
@@ -146,7 +146,7 @@ def roulette():
             else:
                 context['raffle_date'] = str(raffle.date).replace(" ", "T")
             return render_template('index.html', **context)
-        elif raffle.date > datetime.datetime.now() > raffle.date-datetime.timedelta(seconds=raffle_delay) and raffle.winners is not None:
+        elif raffle is not None and raffle.date > datetime.datetime.now() > raffle.date-datetime.timedelta(seconds=raffle_delay) and raffle.winners is not None:
             #print("Второстепенный розыгрыш")
             winners = json.loads(raffle.winners)
             context['winner'] = winners[-1]
@@ -155,7 +155,7 @@ def roulette():
             context['avatars'] = many_avatars
             context['raffle_date'] = str(raffle.date).replace(" ", "T")
             return render_template('index.html', **context)
-        elif datetime.datetime.now() > raffle.date and raffle.chance <= 0:
+        elif raffle is not None and datetime.datetime.now() > raffle.date and raffle.chance <= 0:
             raffle.ended = True
             #print("ended")
             Tickets.query.delete()
@@ -198,7 +198,8 @@ def getWinner(participants, raffle):
 # Проверка розыгрыша на актуальность
 def checkRaffle(raffle, participants):
     while True:
-        if datetime.datetime.now()>raffle.date+datetime.timedelta(seconds=raffle_delay):
+        # Проверка, закончился ли розыгрыш
+        if raffle is not None and datetime.datetime.now()>raffle.date+datetime.timedelta(seconds=raffle_delay):
             if len(participants) == 0 and Raffles.query.filter_by(ended=False).order_by(Raffles.date).first() is not None:
                 print("No tickets, abort")
                 #raffle = Raffles.query.filter_by(ended=False).order_by(Raffles.date).first()
@@ -226,7 +227,7 @@ def checkRaffle(raffle, participants):
                 #print("raffle.date = {}".format(raffle.date))
             else:
                 #print("Raffle expired, get another one")
-                Tickets.query.delete()  
+                Tickets.query.delete()
                 raffle = Raffles.query.filter_by(ended=False).order_by(Raffles.date).first()
         else:
             break
