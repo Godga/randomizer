@@ -236,7 +236,7 @@ def add_raffle():   # Добавление розыгрышей
             value['id'] = raffle.id
             value['date'] = str(raffle.date)[:-3]
             value['created'] = str(raffle.created_on)[:-3]
-            value['members'] = Tickets.query.filter(Ticket.raffle_id == raffle.id).filter(Ticket.activated == True).count()
+            value['members'] = Tickets.query.filter(Tickets.raffle_id == raffle.id).filter(Tickets.activated == True).count()
             value['link'] = "%s/raffle/%s" % (request.host, raffle.link)
             if raffle.winners is not None:
                 value['chance'] = len(json.loads(raffle.winners))
