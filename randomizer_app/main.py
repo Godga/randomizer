@@ -81,8 +81,8 @@ def activate(raffle_link):
             tickets = []
             value = {}
             for ticket in raffle.tickets:
-                print(ticket.ticket_hash)
                 if ticket.activated:
+                    print(ticket.ticket_hash)
                     member = Members.query.filter_by(id=ticket.owner_id).first()
                     value['owner_name'] = member.member_name
                     value['ticket_hash'] = ticket.ticket_hash
