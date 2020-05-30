@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0, shrink-to-fit=no">
+		<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+		<script src="{{ url_for('static', filename='js/jquery-3.5.0.min.js') }}" type="text/javascript"></script>
+		<script src="{{ url_for('static', filename='js/base.js') }}" type="text/javascript"></script>
+		<link href="{{ url_for('static', filename='css/style.css') }}" rel="stylesheet" media="screen">
+		<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+		<title>
+			Рандомайзер
+		</title>
+	</head>
+	<body>
+		<aside id="main_menu">
+			<div class="menu_title">Основное меню</div>
+			<div class="vertical-menu">
+				<a href="/admin/add_tickets">
+					<i class="menu_icon">library_add</i>
+					<div class="list_title">Добавление купонов</div>
+				</a>
+				<a href="/admin/add_raffle">
+					<i class="menu_icon">alarm_add</i>
+					<div class="list_title">Планирование розыгрышей</div>
+				</a>
+				<a href="/admin/change_password">
+					<i class="menu_icon">https</i>
+					<div class="list_title">Смена пароля</div>
+				</a>
+			</div>
+		</aside>
+		<div class="backdrop"></div>
+		<nav class="navbar">
+				<button id="show_menu" class="btn-primary">
+					<i class="navbar_icon">menu</i>
+				</button>
+				<div class="navbar_title">{{ page }}</div>
+				<div class="navbar_right">
+						<div id="navbar_time" class="navbar_time">
+							Время сервера: 
+						</div>
+						<a href="/logout" style="color: inherit;">
+							<button href="/logout" id="show_menu" class="btn-primary">
+								<i class="navbar_icon">exit_to_app</i>
+							</button>
+						</a>
+					</div>
+				</div>
+				<div style="clear: both;"></div>
+		</nav>
+		{% block body_block %}
+		{% endblock %}
+		<!--
+		<div class="footer">
+			<hr>
+				<blockquote class="blockquote text-right">
+					<p class="mb-1">Тестовое задание в ЭР-телеком, 2020</p>
+					<footer class="blockquote-footer">Каркас сервиса голосовых рассылок</footer>
+				</blockquote>
+		</div>
+		-->
+	<input type="hidden" id="nearest_raffle" value="{{ nearest_raffle }}">
+	</body>
+</html>

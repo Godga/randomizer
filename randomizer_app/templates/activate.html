@@ -1,0 +1,54 @@
+<html>
+    <head>
+        <title>Активация купона</title>
+        <meta charset="utf-8">
+        <link href="{{ url_for('static', filename='css/activate.css') }}" rel="stylesheet">
+        <link href="{{ url_for('static', filename='css/libraries/bootstrap.min.css') }}" rel="stylesheet" media="screen">
+    </head>
+    <body>
+        <script src="{{ url_for('static', filename='js/jquery-3.5.0.min.js') }}"></script>
+        <script src="{{ url_for('static', filename='js/login.js') }}"></script>
+        <div class="container">
+            <form class="form-container" method="post" action="{{ url_for('main.activate', member_link=member_link) }}">
+            	<table align="center">
+                    {% if big_error is defined %}
+                    <tr>
+                        <td><div class="error">{{ big_error }}</div></td>
+                    </tr>
+                    {% else %}
+                    <tr>
+                        <td><label for="ticket">{{ member_name }}, введите ваш купон:</label></td>
+                    </tr> 
+                    <tr>
+              	        <td><input placeholder="" type="text" name="ticket" id="ticket" required></td>
+                    </tr>
+	                <tr>
+                        <td>
+                            <button class="btn btn-primary ml-auto post" type="submit">Активировать</button>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td><div class="error">{{ error }}</div></td>
+                    </tr>
+                    <tr>
+                        <td><div class="result">{{ result }}{% if avatar is defined %}<br/>Индивидуальный аватар пользователя:<br/><img src="{{ avatar }}" width="150" height="150">{% endif %}</div></td>
+                    </tr>
+	                <tr>
+                        <td>
+                            Ваши активированные купоны:
+                        </td>
+                    </tr>
+                    {% for value in tickets %}
+                    <tr>
+                        <td>
+                            {{value}}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                    {% endif %}
+   	            </table>
+            </form>
+        </div>
+        <div class="loader"><div class="lds-default"><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div></div></div>
+    </body>
+</html>

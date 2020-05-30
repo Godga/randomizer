@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>Рандомайзер</title>
+	</head>
+	<body>
+		<link href="{{ url_for('static', filename='css/libraries/bootstrap.min.css') }}" rel="stylesheet" media="screen">
+		<link href="{{ url_for('static', filename='css/index.css') }}" rel="stylesheet">
+		<div id="main"> 
+        <div id="mxwidth">
+			<div id="winTop">
+			</div>
+			<div id="winBottom">
+			</div>
+            <ul id="boxes">
+				{% for value in avatars %}
+				<li class='tape'><img src="{{ value.image }}" alt="{{ value.name }}" class='tape-img'></li>
+				{% endfor %}
+			</ul>
+       	</div>
+    </div>
+	</div>
+	{% if winner is defined %}
+	<button id="timer" class="btn btn-primary mainbutt" style="display: none; opacity: 0;"></button>
+	<button id="go" class="btn btn-primary mainbutt">Крутить</button>
+	<div class="result" >
+		Имя победителя:<br/>
+		{{ winner.name }}<br/>
+		Все победители текущего розыгрыша:<br/>
+		{% for value in winners %}
+		{{ value.name }}<br/>
+		{% endfor %}
+	</div>
+	<input id="winner_id" type="hidden" value="{{ winner_id }}">
+	{% else %}
+	<button id="timer" class="btn btn-primary mainbutt"></button>
+	{% endif %}
+	<input id="raffle_date" type="hidden" value="{{ raffle_date }}">
+	<script src="{{ url_for('static', filename='js/jquery-3.5.0.min.js') }}"></script>
+	<script src="{{ url_for('static', filename='js/index.js') }}"></script>
+	</body>
+</html>
