@@ -156,7 +156,7 @@ def add_tickets():  # Добавление купонов
                     try:
                         ticket_hash = uuid.uuid4().hex
                         owner_id = member_obj.id
-                        ticket_obj = Tickets(ticket_hash=ticket_hash, owner_id=owner_id, raffle_id=raffle_id activated=False)
+                        ticket_obj = Tickets(ticket_hash=ticket_hash, owner_id=owner_id, raffle_id=raffle_id, activated=False)
                         db.session.add(ticket_obj)
                         db.session.commit()
                     except Exception as e:
