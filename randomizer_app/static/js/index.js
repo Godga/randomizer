@@ -27,10 +27,10 @@ function srvTime(){
 $( document ).ready(function() {
     if ($("#raffle_date").val() != "none") {
         var countDownDate = new Date($("#raffle_date").val()).getTime();
-        //console.log($("#raffle_date").val())
+        console.log($("#raffle_date").val())
         var st = srvTime();
         var date = new Date(st);
-        //console.log(date)
+        console.log(date)
         var x = setInterval(function() {
             var now = date.getTime()
             var distance = countDownDate - now;

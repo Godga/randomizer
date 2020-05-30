@@ -1,28 +1,28 @@
 
 //Время сервера
-var xmlHttp;
-function srvTime(){
-    try {
-        xmlHttp = new XMLHttpRequest();
-    }
-    catch (err1) {
-        try {
-            xmlHttp = new ActiveXObject('Msxml2.XMLHTTP');
-        }
-        catch (err2) {
-            try {
-                xmlHttp = new ActiveXObject('Microsoft.XMLHTTP');
-            }
-            catch (eerr3) {
-                alert("Устаревший браузер");
-            }
-        }
-    }
-    xmlHttp.open('HEAD',window.location.href.toString(),false);
-    xmlHttp.setRequestHeader("Content-Type", "text/html");
-    xmlHttp.send('');
-    return xmlHttp.getResponseHeader("Date");
-}
+//var xmlHttp;
+//function srvTime(){
+//    try {
+//        xmlHttp = new XMLHttpRequest();
+//    }
+//    catch (err1) {
+//        try {
+//            xmlHttp = new ActiveXObject('Msxml2.XMLHTTP');
+//        }
+//        catch (err2) {
+//            try {
+//                xmlHttp = new ActiveXObject('Microsoft.XMLHTTP');
+//            }
+//            catch (eerr3) {
+//                alert("Устаревший браузер");
+//            }
+//        }
+//    }
+//    xmlHttp.open('HEAD',window.location.href.toString(),false);
+//    xmlHttp.setRequestHeader("Content-Type", "text/html");
+//    xmlHttp.send('');
+//    return xmlHttp.getResponseHeader("Date");
+//}
 
 
 $( document ).ready(function() {
@@ -30,7 +30,6 @@ $( document ).ready(function() {
     // Таймер
     if ($("#nearest_raffle").val() != "none") {
         var countDownDate = new Date($("#nearest_raffle").val()).getTime();
-        var st = srvTime();
         var date = new Date(st);
         var x = setInterval(function() {
             var now = date.getTime()
@@ -52,7 +51,6 @@ $( document ).ready(function() {
         }, 1000);
     }
     else {
-        var st = srvTime();
         var date = new Date(st);
         var x = setInterval(function() {
             $("#navbar_time").text("Розыгрышей нет  " + "Время сервера: " + (date.getHours()<10?'0':'') + date.getHours() + ":"

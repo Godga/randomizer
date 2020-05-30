@@ -59,7 +59,8 @@ def admin_main():
 def add_tickets():  # Добавление купонов
     # добавить проверку имен на уникальность, и анимацию загрузки
     context = {
-    "page": "Настройки - добавление купонов"
+    "page": "Настройки - добавление купонов",
+    "datetime": str(datetime.datetime.now())
     }
     if request.method == "POST":
         if request.form['ticket_number'] != "" and request.form['ticket_owner2'] != "":
