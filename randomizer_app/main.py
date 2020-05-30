@@ -99,6 +99,7 @@ def activate(raffle_link):
             #for ticket in member.member_tickets:
             #    print(ticket.ticket_hash)
             context['raffle_link'] = raffle_link
+            print(tickets)
             context['tickets'] = tickets
             context['raffle_id'] = raffle.id
             context['raffle_desc'] = raffle.description

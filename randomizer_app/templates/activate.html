@@ -34,7 +34,7 @@
                         <td><div class="result">{{ result }}{% if avatar is defined %}<br/>Индивидуальный аватар пользователя:<br/><img src="{{ avatar }}" width="150" height="150">{% endif %}</div></td>
                     </tr>
                 </table>
-                {% if tickets is defined and tickets %}
+                {% if tickets is defined and len(tickets) %}
                 <table align="center">
 	                <tr>
                         <td>
