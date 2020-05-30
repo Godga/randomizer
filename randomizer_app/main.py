@@ -22,14 +22,24 @@ raffle_delay = 90
 def index2():
     return render_template('index.html')
         
-        
-
-@main.route('/activate/<member_link>', methods=['POST', 'GET'])
-def activate(member_link):
-    if Members.query.filter_by(member_link=member_link).scalar() is not None:
-        member = Members.query.filter_by(member_link=member_link).first()
+@main.route('/')
+def index():
+    raffle = Raffles.query.order_by(Raffles.date).first()
+    if raffle is not None:
+        return redirect(url_for('main.roulette', raffle_link=raffle.link))
+    else:
         context = {
-            "member_name": member.member_name
+            "big_error": "Нет запланированных розыгрышей, попробуйте зайти позже"
+        }
+        return render_template('activate.html', **context)
+    return 
+
+@main.route('/activate/<raffle_link>', methods=['POST', 'GET'])
+def activate(raffle_link):
+    if Raffles.query.filter_by(link=raffle_link).first() is not None:
+        raffle = Raffle.query.filter_by(link=raffle_link).first()
+        context = {
+            "raffle_desc": raffle.description
         }
         if request.method == 'POST':
             if request.form['ticket'] is not None and request.form['ticket'] != "":
@@ -67,8 +77,13 @@ def activate(member_link):
                 return redirect(url_for('main.activate', member_link=member_link))
         else:
             tickets = []
-            for ticket in member.member_tickets:
-                tickets.append(ticket.ticket_hash)
+            value = {}
+            for ticket in raffle.tickets:
+                if ticket.activated:
+                    member = Members.query.filter_by(id=ticket.owner_id).first()
+                    value['owner_name'] = member.member_name
+                    value['ticket_hash'] = ticket.ticket_hash
+                    tickets.append(value)
             if 'error' in cookie and cookie['error'] != "":
                 context['error'] = cookie['error']
                 cookie['error'] = ""
@@ -86,97 +101,97 @@ def activate(member_link):
             return render_template('activate.html', **context)
     else:
         context = {
-            "big_error": "Некорректный код участника. Проверьте ссылку и попробуйте снова"
+            "big_error": "Некорректный ID розыгрыша. Проверьте ссылку и попробуйте снова"
         }
         return render_template('activate.html', **context)
 
-@main.route('/')
-def roulette2():
-    context = {}
-    members = Members.query.all()
-    avatars = []
-    for member in members:
-        avatar_dir = os.path.join(app.root_path, "static")
-        avatar_dir = os.path.join(avatar_dir, 'images', member.member_link+'.png')
-        if os.path.exists(avatar_dir) != True:
-            generate_avatar(420, 12, avatar_dir)
-        if member.member_tickets is not None:
-            for ticket in member.member_tickets:
-                if ticket.activated:
-                    avatar = {
-                        'id': member.id,
-                        'name': member.member_name,
-                        'image': url_for('static', filename='images/'+member.member_link+'.png'),
-                        'ticket': ticket.ticket_hash
-                    }
-                    avatars.append(avatar)
-    # Наполнение ленты
-    many_avatars = avatars+avatars
-    many_avatars = many_avatars+many_avatars
-    many_avatars = many_avatars+avatars
-    if Raffles.query.filter_by(ended=False).order_by(Raffles.date).first() is not None: # Проверка есть ли розыгрыши
-        
-        raffle = Raffles.query.filter_by(ended=False).order_by(Raffles.date).first()
-        # Проверка розыгрыша на актуальность
-        raffle = checkRaffle2(raffle, avatars)
-
-        #print(raffle.date)
-        #print(datetime.datetime.now())
-        if raffle is not None and datetime.datetime.now()>raffle.date and raffle.chance != 0:
-            if len(avatars) == 0:
-                print("No tickets, abort")
-                raffle = Raffles.query.filter_by(ended=False).order_by(Raffles.date).first()
-                raffle.ended == True
-                Tickets.query.delete()
-                db.session.commit()
-                context['raffle_date'] = "none"
-                return render_template('index.html', **context)
-            #print("Первый розыгрыш")
-            # Выбор победителя + увеличение даты на установленное время
-            index = getWinner(avatars, raffle)
-            winners = json.loads(raffle.winners)
-            #print(winners)
-            context['winner'] = avatars[index]
-            context['winner_id'] = index
-            cookie['winner_id'] = index
-            context['winners'] = winners
-            context['avatars'] = many_avatars
-            if raffle is None:
-                context['raffle_date'] = "none"
-            else:
-                context['raffle_date'] = str(raffle.date).replace(" ", "T")
-            return render_template('index.html', **context)
-        elif raffle is not None and raffle.date > datetime.datetime.now() > raffle.date-datetime.timedelta(seconds=raffle_delay) and raffle.winners is not None:
-            #print("Второстепенный розыгрыш")
-            winners = json.loads(raffle.winners)
-            context['winner'] = winners[-1]
-            context['winner_id'] = cookie['winner_id']
-            context['winners'] = winners
-            context['avatars'] = many_avatars
-            context['raffle_date'] = str(raffle.date).replace(" ", "T")
-            return render_template('index.html', **context)
-        elif raffle is not None and datetime.datetime.now() > raffle.date and raffle.chance <= 0:
-            raffle.ended = True
-            #print("ended")
-            Tickets.query.delete()
-            raffle = Raffles.query.filter_by(ended=False).order_by(Raffles.date).first()
-            db.session.commit()
-            if Raffles.query.filter_by(ended=False).order_by(Raffles.date).first() is not None:
-                raffle = Raffles.query.filter_by(ended=False).order_by(Raffles.date).first()
-            else:
-                raffle = None
-        #print("Простой")
-        if raffle == None: 
-            context['raffle_date'] = "none"
-        else:
-            context['raffle_date'] = str(raffle.date).replace(" ", "T")
-        context['avatars'] = many_avatars
-        return render_template('index.html', **context)
-    else:
-        context['raffle_date'] = "none"
-        context['avatars'] = many_avatars
-        return render_template('index.html', **context)
-        #return render_template('index.html')
+#@main.route('/')
+#def roulette2():
+#    context = {}
+#    members = Members.query.all()
+#    avatars = []
+#    for member in members:
+#        avatar_dir = os.path.join(app.root_path, "static")
+#        avatar_dir = os.path.join(avatar_dir, 'images', member.member_link+'.png')
+#        if os.path.exists(avatar_dir) != True:
+#            generate_avatar(420, 12, avatar_dir)
+#        if member.member_tickets is not None:
+#            for ticket in member.member_tickets:
+#                if ticket.activated:
+#                    avatar = {
+#                        'id': member.id,
+#                        'name': member.member_name,
+#                        'image': url_for('static', filename='images/'+member.member_link+'.png'),
+#                        'ticket': ticket.ticket_hash
+#                    }
+#                    avatars.append(avatar)
+#    # Наполнение ленты
+#    many_avatars = avatars+avatars
+#    many_avatars = many_avatars+many_avatars
+#    many_avatars = many_avatars+avatars
+#    if Raffles.query.filter_by(ended=False).order_by(Raffles.date).first() is not None: # Проверка есть ли розыгрыши
+#        
+#        raffle = Raffles.query.filter_by(ended=False).order_by(Raffles.date).first()
+#        # Проверка розыгрыша на актуальность
+#        raffle = checkRaffle2(raffle, avatars)
+#
+#        #print(raffle.date)
+#        #print(datetime.datetime.now())
+#        if raffle is not None and datetime.datetime.now()>raffle.date and raffle.chance != 0:
+#            if len(avatars) == 0:
+#                print("No tickets, abort")
+#                raffle = Raffles.query.filter_by(ended=False).order_by(Raffles.date).first()
+#                raffle.ended == True
+#                Tickets.query.delete()
+#                db.session.commit()
+#                context['raffle_date'] = "none"
+#                return render_template('index.html', **context)
+#            #print("Первый розыгрыш")
+#            # Выбор победителя + увеличение даты на установленное время
+#            index = getWinner(avatars, raffle)
+#            winners = json.loads(raffle.winners)
+#            #print(winners)
+#            context['winner'] = avatars[index]
+#            context['winner_id'] = index
+#            cookie['winner_id'] = index
+#            context['winners'] = winners
+#            context['avatars'] = many_avatars
+#            if raffle is None:
+#                context['raffle_date'] = "none"
+#            else:
+#                context['raffle_date'] = str(raffle.date).replace(" ", "T")
+#            return render_template('index.html', **context)
+#        elif raffle is not None and raffle.date > datetime.datetime.now() > raffle.date-datetime.timedelta(seconds=raffle_delay) and raffle.winners is not None:
+#            #print("Второстепенный розыгрыш")
+#            winners = json.loads(raffle.winners)
+#            context['winner'] = winners[-1]
+#            context['winner_id'] = cookie['winner_id']
+#            context['winners'] = winners
+#            context['avatars'] = many_avatars
+#            context['raffle_date'] = str(raffle.date).replace(" ", "T")
+#            return render_template('index.html', **context)
+#        elif raffle is not None and datetime.datetime.now() > raffle.date and raffle.chance <= 0:
+#            raffle.ended = True
+#            #print("ended")
+#            Tickets.query.delete()
+#            raffle = Raffles.query.filter_by(ended=False).order_by(Raffles.date).first()
+#            db.session.commit()
+#            if Raffles.query.filter_by(ended=False).order_by(Raffles.date).first() is not None:
+#                raffle = Raffles.query.filter_by(ended=False).order_by(Raffles.date).first()
+#            else:
+#                raffle = None
+#        #print("Простой")
+#        if raffle == None: 
+#            context['raffle_date'] = "none"
+#        else:
+#            context['raffle_date'] = str(raffle.date).replace(" ", "T")
+#        context['avatars'] = many_avatars
+#        return render_template('index.html', **context)
+#    else:
+#        context['raffle_date'] = "none"
+#        context['avatars'] = many_avatars
+#        return render_template('index.html', **context)
+#        #return render_template('index.html')
 
 @main.route('/raffle/<raffle_link>', methods=['POST', 'GET'])
 def roulette(raffle_link):

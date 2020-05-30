@@ -51,7 +51,7 @@ $( document ).ready(function() {
         }, 1000);
     }
     else {
-        $("#timer").text("Нет запланированных розыгрышей");
+        $("#timer").text("Розыгрыш завершен");
     }
 
     jQuery.easing['easeOutCirc'] = function (x, t, b, c, d) {

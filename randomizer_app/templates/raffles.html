@@ -16,11 +16,11 @@
 						</ul>
 						<div class="tabs_content {{ active_1 }}">
 							<div class="form-inline">
-								<div class="form-group left">
+								<div class="form-group left1">
 									<label for="raffle_date">Дата розыгрыша:</label>
 									<input type="datetime-local" id="raffle_date" name="raffle_date" required>
 								</div>
-								<div class="form-group right">
+								<div class="form-group right1">
 									<label for="raffle_chance">Победных купонов:</label>
 									<input type="text" id="raffle_chance" name="raffle_chance" required>
 								</div>
@@ -41,6 +41,7 @@
 									<th>Дата создания</th>
 									<th>Победителей</th>
 									<th>Количество участников</th>
+									<th>Ссылка</th>
 									<th>Подробнее</th>
 								</tr>
 								{% if raffles is defined %}
@@ -52,6 +53,7 @@
 									<td>{{ value.created }}</td>
 									<td>{{ value.chance }}</td>
 									<td>{{ value.members }}</td>
+									<td><a href="{{ value.link }}">{{ value.link }}</a></td>
 									<td><a href="{{ url_for('admin.raffle_edit', raffle_id=value.id) }}">Подробнее</a></td>
 								</tr>
 								{% endif %}

@@ -33,18 +33,19 @@
                     <tr>
                         <td><div class="result">{{ result }}{% if avatar is defined %}<br/>Индивидуальный аватар пользователя:<br/><img src="{{ avatar }}" width="150" height="150">{% endif %}</div></td>
                     </tr>
+                    {% if tickets is defined %}
 	                <tr>
                         <td>
-                            Ваши активированные купоны:
+                            Активированные купоны:
                         </td>
                     </tr>
                     {% for value in tickets %}
                     <tr>
-                        <td>
-                            {{value}}
-                        </td>
+                        <td>{{value.ticket_hash}}</td>
+                        <td>{{value.owner_name}}</td>
                     </tr>
                     {% endfor %}
+                    {% endif %}
                     {% endif %}
    	            </table>
             </form>
