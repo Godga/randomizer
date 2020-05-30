@@ -253,7 +253,7 @@ def roulette(raffle_link):
             db.session.commit()
             #context['raffle_date'] = "none"
             return redirect(url_for('main.roulette', raffle_link=raffle_link))
-        #print("Первый розыгрыш")
+        print("Первый розыгрыш")
         # Выбор победителя + увеличение даты на установленное время
         index = getWinner(avatars, raffle)
         winners = json.loads(raffle.winners)
@@ -269,7 +269,7 @@ def roulette(raffle_link):
             context['raffle_date'] = str(raffle.date).replace(" ", "T")
         return render_template('index.html', **context)
     elif raffle.date > datetime.datetime.now() > raffle.date-datetime.timedelta(seconds=raffle_delay) and raffle.winners is not None:
-        #print("Второстепенный розыгрыш")
+        print("Второстепенный розыгрыш")
         winners = json.loads(raffle.winners)
         context['winner'] = winners[-1]
         context['winner_id'] = cookie['winner_id']
@@ -279,11 +279,11 @@ def roulette(raffle_link):
         return render_template('index.html', **context)
     elif datetime.datetime.now() > raffle.date and raffle.chance <= 0:
         raffle.ended = True
-        #print("ended")
+        print("ended")
         Tickets.query.filter(Tickets.raffle_id == raffle.id).delete()
         raffle = Raffles.query.filter_by(ended=False).order_by(Raffles.date).first()
         db.session.commit()
-    #print("Простой")
+    print("Простой")
     context['raffle_date'] = str(raffle.date).replace(" ", "T")
     context['avatars'] = many_avatars
     return render_template('index.html', **context)
