@@ -38,7 +38,7 @@ def index():
 def activate(raffle_link):
     if Raffles.query.filter_by(link=raffle_link).first() is not None:
         raffle = Raffles.query.filter_by(link=raffle_link).first()
-        if datetime.datetime.now()>raffle.date-datetime.timedelta(seconds=raffle_delay):
+        if datetime.datetime.now()<raffle.date-datetime.timedelta(seconds=raffle_delay):
             context = {
                 "raffle_desc": raffle.description
             }
