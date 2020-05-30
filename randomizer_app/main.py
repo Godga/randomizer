@@ -83,6 +83,7 @@ def activate(raffle_link):
                 if ticket.activated:
                     print("Тикет - "+ticket.ticket_hash)
                     member = Members.query.filter_by(id=ticket.owner_id).first()
+                    print("Хозяин - "+member.member_name)
                     value = {}
                     value['owner_name'] = member.member_name
                     value['ticket_hash'] = ticket.ticket_hash
