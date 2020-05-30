@@ -44,8 +44,10 @@ def activate(raffle_link):
         if request.method == 'POST':
             if request.form['ticket'] is not None and request.form['ticket'] != "":
                 ticket_hash = request.form['ticket']
-                for ticket in member.member_tickets:
+                for ticket in raffle.tickets:
                     if ticket.ticket_hash == ticket_hash:
+                        member = Members.query.filter(Members.id == ticket.owner_id).first()
+                        member_link = member.member_link
                         if ticket.activated != True:
                             ticket.activated = True
                             try:
@@ -53,28 +55,27 @@ def activate(raffle_link):
                             except Exception as e:
                                 print("Exception occured: "+str(e))
                                 cookie['error'] = "Ошибка базы данных"
-                                return redirect(url_for('main.activate', member_link=member_link))
+                                return redirect(url_for('main.activate', raffle_link=raffle_link))
                             avatar_dir = os.path.join(app.root_path, "static")
                             avatar_dir = os.path.join(avatar_dir, 'images', member_link+'.png')
                             if os.path.exists(avatar_dir) != True:
                                 generate_avatar(420, 12, avatar_dir)
                             cookie['avatar'] = url_for('static', filename='images/'+member_link+'.png')
                             cookie['result'] = "Купон успешно активирован!"
-                            return redirect(url_for('main.activate', member_link=member_link))
+                            return redirect(url_for('main.activate', raffle_link=raffle_link))
                         else:
-                           
                             avatar_dir = os.path.join(app.root_path, "static")
                             avatar_dir = os.path.join(avatar_dir, 'images', member_link+'.png')
                             if os.path.exists(avatar_dir) != True:
                                 generate_avatar(420, 12, avatar_dir)
                             cookie['avatar'] = url_for('static', filename='images/'+member_link+'.png')
                             cookie['error'] = "Купон уже активирован"
-                            return redirect(url_for('main.activate', member_link=member_link))
+                            return redirect(url_for('main.activate', raffle_link=raffle_link))
                 cookie['error'] = "Купон не найден"
-                return redirect(url_for('main.activate', member_link=member_link))
+                return redirect(url_for('main.activate', raffle_link=raffle_link))
             else:
                 cookie['error'] = "Введите купон!"
-                return redirect(url_for('main.activate', member_link=member_link))
+                return redirect(url_for('main.activate', raffle_link=raffle_link))
         else:
             tickets = []
             value = {}
@@ -95,8 +96,7 @@ def activate(raffle_link):
                 cookie['avatar'] = ""
             #for ticket in member.member_tickets:
             #    print(ticket.ticket_hash)
-            context['member_link'] = member_link
-
+            context['raffle_link'] = raffle_link
             context['tickets'] = tickets
             return render_template('activate.html', **context)
     else:

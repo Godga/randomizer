@@ -89,7 +89,7 @@ def add_tickets():  # Добавление купонов
                         member_obj = Members.query.filter_by(member_name=ticket_owner).first()
                         member_link = member_obj.member_link
                         #ticket_link = request.host + "/activate/" + member_link
-                    ticket_link = "%s/activate/%s" % (request.host, raffle_link)
+                    ticket_link = "/activate/%s" % (raffle_link)
                     date = datetime.datetime.now().strftime("%Y-%m-%d")
                     invalid_chars = string.punctuation
                     ticket_owner = ''.join(c for c in ticket_owner if c not in invalid_chars)
@@ -152,7 +152,7 @@ def add_tickets():  # Добавление купонов
                         member_obj = Members.query.filter_by(member_name=ticket_owner).first()
                         member_link = member_obj.member_link
                         #ticket_link = request.host + "/activate/" + member_link
-                    ticket_link = "%s/activate/%s" % (request.host, raffle_link)
+                    ticket_link = "/activate/%s" % (raffle_link)
                     try:
                         ticket_hash = uuid.uuid4().hex
                         owner_id = member_obj.id
@@ -167,7 +167,7 @@ def add_tickets():  # Добавление купонов
                     avatar_dir = os.path.join(avatar_dir, 'images', member_link+'.png')
                     if os.path.exists(avatar_dir) != True:
                         generate_avatar(420, 12, avatar_dir)
-                    cookie['raffle_link'] = "%s/raffle/%s" % (request.host, raffle.link)
+                    cookie['raffle_link'] = "/raffle/%s" % (raffle.link)
                     cookie['ticket_link'] = ticket_link
                     cookie['ticket_hash'] = ticket_hash
                     cookie['result'] = "Купон добавлен успешно!"
@@ -490,7 +490,7 @@ def getTickets(raffle_id=None):
         value['raffle_id'] = ticket.raffle_id
         raffle = Raffles.query.filter(Raffles.id == ticket.raffle_id).first()
         if raffle is not None:
-            value['raffle_link'] = "%s/raffle/%s" % (request.host, raffle.link)
+            value['raffle_link'] = "/raffle/%s" % (raffle.link)
         else:
             value['raffle_link'] = ""
         result.append(value)
