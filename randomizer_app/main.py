@@ -243,6 +243,11 @@ def roulette(raffle_link):
         context['raffle_date'] = "none"
         return render_template('index.html', **context)
     elif raffle.ended == True:
+        ticket = Tickets.query.filter(Tickets.raffle_id == raffle.id).first()
+        if ticket is not None:
+            Tickets.query.filter(Tickets.raffle_id == raffle.id).delete()
+            #raffle = Raffles.query.filter_by(ended=False).order_by(Raffles.date).first()
+            db.session.commit()
         print("Raffle ended")
         winners = json.loads(raffle.winners)
         print(winners)
@@ -346,6 +351,7 @@ def checkRaffle(raffle, participants):
                 #print("raffle chance = {}".format(str(raffle.chance)))
                 #print("raffle.date = {}".format(raffle.date))
             else:
+                #
                 break
         else:
             break
