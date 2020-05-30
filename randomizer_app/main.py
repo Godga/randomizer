@@ -37,7 +37,7 @@ def index():
 @main.route('/activate/<raffle_link>', methods=['POST', 'GET'])
 def activate(raffle_link):
     if Raffles.query.filter_by(link=raffle_link).first() is not None:
-        raffle = Raffle.query.filter_by(link=raffle_link).first()
+        raffle = Raffles.query.filter_by(link=raffle_link).first()
         context = {
             "raffle_desc": raffle.description
         }
