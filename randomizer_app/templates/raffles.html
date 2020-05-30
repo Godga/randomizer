@@ -53,7 +53,7 @@
 									<td>{{ value.created }}</td>
 									<td>{{ value.chance }}</td>
 									<td>{{ value.members }}</td>
-									<td><a href="{{ value.link }}">{{ value.link }}</a></td>
+									<td><a href="{{ url_for('main.roulette', raffle_link = value.link) }}">{{ value.link }}</a></td>
 									<td><a href="{{ url_for('admin.raffle_edit', raffle_id=value.id) }}">Подробнее</a></td>
 								</tr>
 								{% endif %}
@@ -69,6 +69,7 @@
 									<th>Дата создания</th>
 									<th>Победителей</th>
 									<th>Количество участников</th>
+									<th>Ссылка</th>
 									<th>Результаты</th>
 								</tr>
 								{% if raffles is defined %}
@@ -80,6 +81,7 @@
 									<td>{{ value.created }}</td>
 									<td>{{ value.chance }}</td>
 									<td>{{ value.members }}</td>
+									<td><a href="{{ url_for('main.roulette', raffle_link = value.link) }}">{{ value.link }}</a></td>
 									<td><a href="{{ url_for('admin.raffle_results', raffle_id=value.id) }}">Результаты</a></td>
 								</tr>
 								{% endif %}

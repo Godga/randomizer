@@ -89,7 +89,7 @@ def add_tickets():  # Добавление купонов
                         member_obj = Members.query.filter_by(member_name=ticket_owner).first()
                         member_link = member_obj.member_link
                         #ticket_link = request.host + "/activate/" + member_link
-                    ticket_link = "/activate/%s" % (raffle_link)
+                    ticket_link = raffle_link
                     date = datetime.datetime.now().strftime("%Y-%m-%d")
                     invalid_chars = string.punctuation
                     ticket_owner = ''.join(c for c in ticket_owner if c not in invalid_chars)
@@ -237,7 +237,7 @@ def add_raffle():   # Добавление розыгрышей
             value['date'] = str(raffle.date)[:-3]
             value['created'] = str(raffle.created_on)[:-3]
             value['members'] = Tickets.query.filter(Tickets.raffle_id == raffle.id).filter(Tickets.activated == True).count()
-            value['link'] = "%s/raffle/%s" % (request.host, raffle.link)
+            value['link'] = raffle.link
             if raffle.winners is not None:
                 value['chance'] = len(json.loads(raffle.winners))
             else:

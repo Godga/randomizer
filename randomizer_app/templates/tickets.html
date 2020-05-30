@@ -96,7 +96,7 @@
 									<td>{{ value.owner }}</td>
 									<td>{{ value.activated }}</td>
 									{% if value.raffle_link != "" %}
-									<td><a href="{{ value.raffle_link }}">{{ value.raffle_id }}</a></td>
+									<td><a href="{{ url_for('main.roulette', raffle_link = value.raffle_link) }}">{{ value.raffle_id }}</a></td>
 									{% else %}
 									<td>{{ value.raffle_id }}</td>
 									{% endif %}

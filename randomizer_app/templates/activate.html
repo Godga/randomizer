@@ -9,7 +9,7 @@
         <script src="{{ url_for('static', filename='js/jquery-3.5.0.min.js') }}"></script>
         <script src="{{ url_for('static', filename='js/login.js') }}"></script>
         <div class="container">
-            <form class="form-container" method="post" action="{{ url_for('main.activate', member_link=member_link) }}">
+            <form class="form-container" method="post" action="{{ url_for('main.activate', raffle_link=raffle_link) }}">
             	<table align="center">
                     {% if big_error is defined %}
                     <tr>
