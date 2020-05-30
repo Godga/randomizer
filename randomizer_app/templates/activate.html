@@ -17,7 +17,7 @@
                     </tr>
                     {% else %}
                     <tr>
-                        <td><label for="ticket">{{ member_name }}, введите ваш купон:</label></td>
+                        <td><label for="ticket">Активация купонов для розыгрыша №{{ raffle_id }} - {{ raffle_desc }}</br>Введите ваш купон:</label></td>
                     </tr> 
                     <tr>
               	        <td><input placeholder="" type="text" name="ticket" id="ticket" required></td>
@@ -33,7 +33,7 @@
                     <tr>
                         <td><div class="result">{{ result }}{% if avatar is defined %}<br/>Индивидуальный аватар пользователя:<br/><img src="{{ avatar }}" width="150" height="150">{% endif %}</div></td>
                     </tr>
-                    {% if tickets is defined %}
+                    {% if tickets is defined and tickets %}
 	                <tr>
                         <td>
                             Активированные купоны:
