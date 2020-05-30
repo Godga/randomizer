@@ -26,14 +26,24 @@
 	<div class="result" >
 		Имя победителя:<br/>
 		{{ winner.name }}<br/>
+		{% if winners is defined %}
+		Все победители текущего розыгрыша:<br/>
+		{% for value in winners %}
+		{{ value.name }}<br/>
+		{% endfor %}
+		{% endif %}
+	</div>
+	<input id="winner_id" type="hidden" value="{{ winner_id }}">
+	{% else %}
+	<button id="timer" class="btn btn-primary mainbutt"></button>
+	{% if winners is defined %}
+	<div class="result" >
 		Все победители текущего розыгрыша:<br/>
 		{% for value in winners %}
 		{{ value.name }}<br/>
 		{% endfor %}
 	</div>
-	<input id="winner_id" type="hidden" value="{{ winner_id }}">
-	{% else %}
-	<button id="timer" class="btn btn-primary mainbutt"></button>
+	{% endif %}
 	{% endif %}
 	<input id="raffle_date" type="hidden" value="{{ raffle_date }}">
 	<script src="{{ url_for('static', filename='js/jquery-3.5.0.min.js') }}"></script>

@@ -102,7 +102,12 @@ def add_tickets():  # Добавление купонов
                         ticket_hash = uuid.uuid4().hex
                         #print("ticket_hash = {}".format(str(ticket_hash)))
                         owner_id = member_obj.id
-                        ticket_obj = Tickets(ticket_hash=ticket_hash, owner_id=owner_id, raffle_id=raffle_id, activated=False)
+                        ticket_obj = Tickets(
+                            ticket_hash=ticket_hash, 
+                            owner_id=owner_id, 
+                            raffle_id=raffle_id, 
+                            activated=True #Не забыть выставить в False
+                        ) 
                         db.session.add(ticket_obj)
                         f.write(ticket_hash+"\n")
 

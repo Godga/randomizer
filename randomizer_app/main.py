@@ -221,7 +221,7 @@ def roulette(raffle_link):
                         'ticket': ticket.ticket_hash
                     }
                     avatars.append(avatar)
-    raffle = checkRaffle(raffle, avatars)
+    #raffle = checkRaffle(raffle, avatars)
     if raffle is None:
         print("Raffle is None")
         context['raffle_date'] = "none"
